@@ -1,0 +1,7 @@
+.*
+*.cer
+*.json
+*.key
+!.gitignore
+certs
+traefik-certs-exporter
