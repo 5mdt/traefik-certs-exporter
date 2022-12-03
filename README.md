@@ -1,5 +1,6 @@
 # Traefik certs exporter
 
+[![docker_push](https://github.com/nett00n/traefik-certs-exporter/actions/workflows/docker_push.yml/badge.svg?branch=main)](https://github.com/nett00n/traefik-certs-exporter/actions/workflows/docker_push.yml)
 [![revive linters](https://github.com/nett00n/traefik-certs-exporter/actions/workflows/linter_revive.yml/badge.svg?branch=main)](https://github.com/nett00n/traefik-certs-exporter/actions/workflows/linter_revive.yml)
 
 Script opens `acme.json` file from `input` folder and export it's content to `output` folder as `*.cer` and `*.key` files.
