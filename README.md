@@ -1,5 +1,7 @@
 # Traefik certs exporter
 
+[![revive linters](https://github.com/nett00n/traefik-certs-exporter/actions/workflows/linter_revive.yml/badge.svg?branch=main)](https://github.com/nett00n/traefik-certs-exporter/actions/workflows/linter_revive.yml)
+
 Script opens `acme.json` file from `input` folder and export it's content to `output` folder as `*.cer` and `*.key` files.
 
 There is template `acme.json` file in `input` directory for demonstration purposes. It is added in `.gitignore` - feel free to modify or delete it.
