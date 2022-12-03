@@ -22,6 +22,7 @@ jobs:
         run: |
           ls -lah
           pwd
+          env
       # - name: Upload Go binaries
       #   uses: actions/upload-artifact@v3
       #   with:
