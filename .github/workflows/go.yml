@@ -1,6 +1,6 @@
 name: Upload Go test results
 
-on: 
+on:
   - push
 
 jobs:
@@ -19,10 +19,11 @@ jobs:
         with:
           go-version: ${{ matrix.go-version }}
       - name: Install dependencies
-        run: mv traefik-certs-exporter ${GOROOT}/ && cd ${GOROOT} go build traefik-certs-exporter.go
-      - name: Upload Go binaries
-        uses: actions/upload-artifact@v3
-        with:
-          name: traefik-certs-exporter
-          path: ${${GOROOT}}/traefik-certs-exporter
-
+        run: |
+          ls -lah
+          pwd
+      # - name: Upload Go binaries
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: traefik-certs-exporter
+      #     path: ${${GOROOT}}/traefik-certs-exporter
