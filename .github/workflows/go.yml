@@ -1,4 +1,4 @@
-name: Upload Go test results
+name: Compile binary and upload to github
 
 on:
   - push
@@ -18,7 +18,7 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: ${{ matrix.go-version }}
-      - name: Install dependencies
+      - name: Move files to ${GOROOT}
         run: |
           ls -lah
           pwd
