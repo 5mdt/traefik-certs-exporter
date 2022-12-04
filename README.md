@@ -1,8 +1,8 @@
 # Traefik certs exporter
 
-[![docker push](https://github.com/nett00n/traefik-certs-exporter/actions/workflows/docker_push.yml/badge.svg?branch=main)](https://github.com/nett00n/traefik-certs-exporter/actions/workflows/docker_push.yml)
-[![linux build](https://github.com/nett00n/traefik-certs-exporter/actions/workflows/linux_build.yml/badge.svg?branch=main)](https://github.com/nett00n/traefik-certs-exporter/actions/workflows/linux_build.yml)
-[![revive linters](https://github.com/nett00n/traefik-certs-exporter/actions/workflows/linter_revive.yml/badge.svg?branch=main)](https://github.com/nett00n/traefik-certs-exporter/actions/workflows/linter_revive.yml)
+[![Build linux binaries](https://github.com/nett00n/traefik-certs-exporter/actions/workflows/linux_build.yml/badge.svg?branch=main)](https://github.com/nett00n/traefik-certs-exporter/actions/workflows/linux_build.yml)
+[![Push to Dockerhub](https://github.com/nett00n/traefik-certs-exporter/actions/workflows/docker_push.yml/badge.svg?branch=main)](https://github.com/nett00n/traefik-certs-exporter/actions/workflows/docker_push.yml)
+[![Run revive linters](https://github.com/nett00n/traefik-certs-exporter/actions/workflows/linter_revive.yml/badge.svg?branch=main)](https://github.com/nett00n/traefik-certs-exporter/actions/workflows/linter_revive.yml)
 
 Script opens `acme.json` file from `input` folder and export it's content to `output` folder as `*.cer` and `*.key` files.
 

@@ -1,10 +1,12 @@
 ---
-name: docker_push
+name: "Push to Dockerhub"
 
 on:
   push:
     tags:
       - '*'
+    branches:
+      - "main"
 jobs:
   docker_push:
     runs-on: ubuntu-latest
@@ -16,7 +18,15 @@ jobs:
       - run: |
           mkdir ~/.docker/ -p
           echo '${{ secrets.DOCKER_CONFIG_JSON }}' > ~/.docker/config.json
-      - run: test -z "$GITHUB_REF_NAME" || docker build . -t "nett00n/traefik-certs-exporter:$GITHUB_REF_NAME"
-      - run: test -z "$GITHUB_REF_NAME" || docker push "nett00n/traefik-certs-exporter:$GITHUB_REF_NAME"
-      - run: test -z "$GITHUB_SHA" || docker build . -t "nett00n/traefik-certs-exporter:$GITHUB_SHA"
-      - run: test -z "$GITHUB_SHA" || docker push "nett00n/traefik-certs-exporter:$GITHUB_SHA"
+      - run: |
+          test ! -z "$GITHUB_REF_NAME" \
+            || exit 0
+          docker build . -t "nett00n/traefik-certs-exporter:$GITHUB_REF_NAME"
+          docker push "nett00n/traefik-certs-exporter:$GITHUB_REF_NAME"
+      - run: |
+          test ! -z "$GITHUB_SHA" \
+            || exit 0
+          test "${GITHUB_REF_NAME}" == "main" \
+            && exit 0
+          docker build . -t "nett00n/traefik-certs-exporter:$GITHUB_SHA"
+          docker push "nett00n/traefik-certs-exporter:$GITHUB_SHA"

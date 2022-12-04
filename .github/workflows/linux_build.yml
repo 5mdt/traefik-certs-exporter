@@ -1,32 +1,45 @@
 ---
-name: revive linters
+name: "Build linux binaries"
 
 on:
   push:
+    tags:
+      - '*'
+    branches:
+      - "main"
 
 permissions:
   contents: write
-  # packages: write
-  # issues: write
 
 jobs:
   linux_build:
     runs-on: ubuntu-latest
     steps:
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - uses: actions/setup-go@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           go-version: 1.19
-      - run: tar cvf traefik-certs-exporter.tar ./
-      - uses: actions/upload-artifact@v3
-        with:
-          name: sources
-          path: traefik-certs-exporter.tar
       - run: go install github.com/mgechev/revive@v1.2.4
       - run: go build traefik-certs-exporter.go
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: binary_linux
-          path: traefik-certs-exporter
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: traefik-certs-exporter
+          asset_name: traefik-certs-exporter_${{ github.ref }}
+          asset_content_type: application
