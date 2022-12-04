@@ -3,5 +3,6 @@
 *.json
 *.key
 !.gitignore
+!.github
 certs
 traefik-certs-exporter
