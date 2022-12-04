@@ -6,7 +6,7 @@ COPY *.go ./
 RUN go build traefik-certs-exporter
 
 ## Deploy
-FROM busybox
+FROM scratch
 WORKDIR /
 COPY --from=build /usr/local/go/src/traefik-certs-exporter/traefik-certs-exporter /traefik-certs-exporter
 ENTRYPOINT ["/traefik-certs-exporter"]
