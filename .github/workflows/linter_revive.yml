@@ -3,6 +3,8 @@ name: revive linters
 
 on:
   push:
+    tags:
+      - '*'
 
 permissions:
   contents: write
