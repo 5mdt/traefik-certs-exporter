@@ -1,0 +1,28 @@
+name: Upload Go test results
+
+on: 
+  - push
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version:
+          - 1.19
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ matrix.go-version }}
+      - name: Install dependencies
+        run: go build traefik-certs-exporter
+      - name: Upload Go test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: traefik-certs-exporter
+          path: traefik-certs-exporter
+
