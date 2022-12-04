@@ -39,5 +39,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: traefik-certs-exporter
-          asset_name: traefik-certs-exporter_v${{ github.GITHUB_REF_NAME }}
+          asset_name: traefik-certs-exporter_v${{ github.ref_name }}
           asset_content_type: application
