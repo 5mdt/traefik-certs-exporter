@@ -20,4 +20,4 @@ jobs:
           echo '${{ secrets.DOCKER_CONFIG_JSON }}' > ~/.docker/config.json
       - run: |
           docker build . -t "nett00n/traefik-certs-exporter:${{ github.ref_name }}"
-          echo docker push "nett00n/traefik-certs-exporter:${{ github.ref_name }}"
+          docker push "nett00n/traefik-certs-exporter:${{ github.ref_name }}"
