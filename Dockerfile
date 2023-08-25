@@ -2,6 +2,8 @@
 ## Build
 FROM golang:1.19-alpine AS build
 WORKDIR /usr/local/go/src/traefik-certs-exporter
+COPY go.mod go.sum LICENSE README.md ./
+RUN go get -u ./...
 COPY *.go ./
 RUN go build traefik-certs-exporter
 
