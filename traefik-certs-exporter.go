@@ -5,11 +5,13 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"flag"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
+	"time"
+
+	"github.com/fsnotify/fsnotify"
 )
 
 // ACME is an imported global traefik acme.json structure
@@ -41,10 +43,22 @@ func main() {
 	// Parse command-line arguments
 	acmeJSONPath := flag.String("acmejson", "input/acme.json", "Path to the acme.json file")
 	outputDir := flag.String("output", "output", "Path to the output directory")
+	serviceMode := flag.Bool("service", false, "Enable service mode to monitor acme.json for changes")
+
 	flag.Parse()
 
+	if *serviceMode {
+		// Run in service mode
+		runServiceMode(*acmeJSONPath, *outputDir)
+	} else {
+		// Run once
+		exportCertificates(*acmeJSONPath, *outputDir)
+	}
+}
+
+func exportCertificates(acmeJSONPath, outputDir string) {
 	// Open acme.json file
-	jsonFile, err := os.Open(*acmeJSONPath)
+	jsonFile, err := os.Open(acmeJSONPath)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -64,12 +78,12 @@ func main() {
 	}
 
 	// Create output directory if not exists
-	if err := os.MkdirAll(*outputDir, os.ModePerm); err != nil {
+	if err := os.MkdirAll(outputDir, os.ModePerm); err != nil {
 		log.Fatal(err)
 	}
 
 	for _, cert := range traefik.Le.Certificates {
-		domainDir := filepath.Join(*outputDir, cert.Domain.Main)
+		domainDir := filepath.Join(outputDir, cert.Domain.Main)
 		if err := os.MkdirAll(domainDir, os.ModePerm); err != nil {
 			log.Fatal(err)
 		}
@@ -99,5 +113,36 @@ func main() {
 		}
 
 		log.Println("Saved certificate and key for", cert.Domain.Main)
+	}
+}
+
+func runServiceMode(acmeJSONPath, outputDir string) {
+	exportCertificates(acmeJSONPath, outputDir)
+
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer watcher.Close()
+
+	err = watcher.Add(acmeJSONPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Printf("Monitoring %s for changes...\n", acmeJSONPath)
+
+	for {
+		select {
+		case event := <-watcher.Events:
+			if event.Op&fsnotify.Write == fsnotify.Write {
+				log.Println("acme.json has been modified. Exporting certificates...")
+				exportCertificates(acmeJSONPath, outputDir)
+			}
+		case err := <-watcher.Errors:
+			log.Println("Error:", err)
+		}
+		// Sleep for a moment to avoid high CPU usage in the loop
+		time.Sleep(1000 * time.Millisecond)
 	}
 }

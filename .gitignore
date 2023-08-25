@@ -2,7 +2,10 @@
 *.cer
 *.json
 *.key
-!.gitignore
-!.github
+
 certs
+output
 traefik-certs-exporter
+
+!.github
+!.gitignore
