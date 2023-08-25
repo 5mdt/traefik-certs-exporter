@@ -1,4 +1,3 @@
----
 name: "Build linux binaries"
 
 on:
@@ -12,6 +11,11 @@ permissions:
 jobs:
   linux_build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: [1.19]
+        platform: [amd64, arm64, arm]
+
     steps:
       - name: Create Release
         id: create_release
@@ -23,21 +27,33 @@ jobs:
           release_name: Release ${{ github.ref }}
           draft: false
           prerelease: false
+
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - uses: actions/setup-go@v3
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Go
+        uses: actions/setup-go@v3
         with:
-          go-version: 1.19
-      - run: go install github.com/mgechev/revive@v1.2.4
-      - run: go build traefik-certs-exporter.go
-      - uses: actions/upload-release-asset@v1
+          go-version: ${{ matrix.go-version }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install revive
+        run: go install github.com/mgechev/revive@v1.2.4
+
+      - name: Build binaries
+        run: |
+          GOARCH=${{ matrix.platform }}
+          if [ "$GOARCH" == "arm" ]; then GOARM=6; else GOARM=7; fi
+          GOOS=linux GOARCH=$GOARCH GOARM=$GOARM go build -o traefik-certs-exporter_${{ matrix.platform }} traefik-certs-exporter.go
+
+      - name: Upload binaries
+        uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: traefik-certs-exporter
-          asset_name: traefik-certs-exporter_v${{ github.ref_name }}
+          asset_path: traefik-certs-exporter_${{ matrix.platform }}
+          asset_name: traefik-certs-exporter_${{ matrix.platform }}_${{ github.ref_name }}
           asset_content_type: application
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
