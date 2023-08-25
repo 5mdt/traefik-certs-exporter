@@ -4,6 +4,8 @@ package main
 import (
 	"encoding/base64"
 	"encoding/json"
+	"flag"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -36,8 +38,13 @@ type Domain struct {
 }
 
 func main() {
-	// Open json file
-	jsonFile, err := os.Open("input/acme.json")
+	// Parse command-line arguments
+	acmeJSONPath := flag.String("acmejson", "input/acme.json", "Path to the acme.json file")
+	outputDir := flag.String("output", "output", "Path to the output directory")
+	flag.Parse()
+
+	// Open acme.json file
+	jsonFile, err := os.Open(*acmeJSONPath)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -57,14 +64,15 @@ func main() {
 	}
 
 	// Create output directory if not exists
-	outputDir := "output"
-	if err := os.MkdirAll(outputDir, os.ModePerm); err != nil {
+	if err := os.MkdirAll(*outputDir, os.ModePerm); err != nil {
 		log.Fatal(err)
 	}
 
 	for _, cert := range traefik.Le.Certificates {
-		// Print certificate hostname
-		log.Println("Certificate host:", cert.Domain.Main)
+		domainDir := filepath.Join(*outputDir, cert.Domain.Main)
+		if err := os.MkdirAll(domainDir, os.ModePerm); err != nil {
+			log.Fatal(err)
+		}
 
 		// Decode certificate and key
 		certBody, err := base64.StdEncoding.DecodeString(cert.Certificate)
@@ -79,15 +87,14 @@ func main() {
 			continue
 		}
 
-		// Create certificate file
-		certPath := filepath.Join(outputDir, cert.Domain.Main+".cer")
-		if err := ioutil.WriteFile(certPath, certBody, os.ModePerm); err != nil {
+		// Write certificate and key to files
+		certPath := filepath.Join(domainDir, "cert.pem")
+		if err := ioutil.WriteFile(certPath, append(certBody, []byte("\n")...), os.ModePerm); err != nil {
 			log.Println(err)
 		}
 
-		// Create key file
-		keyPath := filepath.Join(outputDir, cert.Domain.Main+".key")
-		if err := ioutil.WriteFile(keyPath, certKey, os.ModePerm); err != nil {
+		keyPath := filepath.Join(domainDir, "privkey.pem")
+		if err := ioutil.WriteFile(keyPath, append(certKey, []byte("\n")...), os.ModePerm); err != nil {
 			log.Println(err)
 		}
 
