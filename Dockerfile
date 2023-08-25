@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 ## Build
-FROM golang:1.19-alpine AS build
+FROM golang:1.19 AS build
 WORKDIR /usr/local/go/src/traefik-certs-exporter
 COPY go.mod go.sum LICENSE README.md ./
 RUN go get -u ./...
